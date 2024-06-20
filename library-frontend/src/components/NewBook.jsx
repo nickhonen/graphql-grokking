@@ -1,21 +1,32 @@
+/* eslint-disable react/prop-types */
 import { useState } from 'react'
+import { CREATE_BOOK, ALL_BOOKS } from '../queries'
+import { useMutation } from '@apollo/client'
 
-const NewBook = (props) => {
+const NewBook = ({ show }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
-  const [published, setPublished] = useState('')
+  const [published, setPublished] = useState(2024)
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
-  // eslint-disable-next-line react/prop-types
-  if (!props.show) {
+  const [ createBook, { error } ] = useMutation(CREATE_BOOK, {
+    refetchQueries: [{ query: ALL_BOOKS }]
+  })
+
+  if (!show) {
     return null
   }
+
+  if (error) return `submission error! ${error.message}`
 
   const submit = async (event) => {
     event.preventDefault()
 
     console.log('add book...')
+    // mutate function
+    await createBook({ variables: { title, published, author, genres }})
+      .catch(error => console.log(error.message))
 
     setTitle('')
     setPublished('')
@@ -51,7 +62,7 @@ const NewBook = (props) => {
           <input
             type="number"
             value={published}
-            onChange={({ target }) => setPublished(target.value)}
+            onChange={({ target }) => setPublished(parseInt(target.value))}
           />
         </div>
         <div>

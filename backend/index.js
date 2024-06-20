@@ -130,7 +130,7 @@ const typeDefs = `
     ): Book
     editAuthor(
       name: String!
-      setBorn: Int
+      setBorn: Int!
     ): Author
   }
 `
