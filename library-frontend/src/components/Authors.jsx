@@ -2,9 +2,10 @@
 import { useState, useEffect } from 'react'
 import { ALL_AUTHORS, EDIT_AUTHOR } from "../queries"
 import { useQuery, useMutation } from '@apollo/client'
+import Select from 'react-select'
 
 const Authors = ({ show, setError }) => {
-  const [name, setName] = useState('')
+  const [name, setName] = useState(null)
   const [birth, setBirth] = useState(2024)
   const { loading, data } = useQuery(ALL_AUTHORS)
   const [ updateAuthor, result] = useMutation(EDIT_AUTHOR, {
@@ -23,13 +24,22 @@ const Authors = ({ show, setError }) => {
     return null
   }
 
+  // populate select list
+  const options = []
+  data.allAuthors.forEach(author => options.push(
+    {
+      value: author.name,
+      label: author.name
+  }))
+
   const submitAuthor = async (event) => {
     event.preventDefault()
 
-    console.log('edit author...')
-    console.log(birth)
 
-    updateAuthor({ variables: { name: name, setBorn: birth }})
+    console.log('edit author...')
+    console.log(name)
+
+    updateAuthor({ variables: { name: name.value, setBorn: birth }})
       .catch(error => console.log(error.message))
     
     setName('')
@@ -63,9 +73,10 @@ const Authors = ({ show, setError }) => {
           onSubmit={submitAuthor}>
           <div>
             name
-            <input
+            <Select
               value={name}
-              onChange={({ target }) => setName(target.value)}
+              onChange={setName}
+              options={options}
             />
           </div>
           <div>
